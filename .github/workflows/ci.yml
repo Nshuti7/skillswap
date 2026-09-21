@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+
+# A new push to the same branch cancels the run still going for the old commit.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # The API imports types from @prisma/client, which do not exist until the
+      # client is generated. Without this step typecheck fails on a fresh clone.
+      # No database is contacted; DATABASE_URL only has to parse.
+      - name: Generate Prisma client
+        env:
+          DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
+        run: pnpm --filter @skillswap/api db:generate
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
