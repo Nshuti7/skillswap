@@ -1,0 +1,218 @@
+// SkillSwap data model, v1 draft. Run `pnpm db:migrate` after editing.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums. Keep in sync with packages/shared/src/index.ts.
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum PortfolioStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Proficiency {
+  LEARNING
+  INTERMEDIATE
+  EXPERT
+}
+
+enum SkillType {
+  TEACH
+  LEARN
+}
+
+enum SkillRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
+
+enum SwapSessionStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ReviewRole {
+  MENTOR
+  LEARNER
+}
+
+enum FlagStatus {
+  OPEN
+  RESOLVED
+}
+
+// Identity and profile
+
+model User {
+  id              String          @id @default(uuid()) @db.Uuid
+  email           String          @unique
+  passwordHash    String          @map("password_hash")
+  name            String
+  bio             String?
+  skillLevel      SkillLevel      @default(BEGINNER) @map("skill_level")
+  portfolioUrl    String?         @map("portfolio_url")
+  portfolioStatus PortfolioStatus @default(PENDING) @map("portfolio_status")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // TODO(team): IUEA verification (isVerified / studentId). Pilot is IUEA-only.
+
+  skills           UserSkill[]
+  sentRequests     SkillRequest[]      @relation("RequestRequester")
+  receivedRequests SkillRequest[]      @relation("RequestTarget")
+  assignmentsGiven SessionAssignment[]
+  uploads          SessionUpload[]
+  reviewsGiven     Review[]            @relation("ReviewAuthor")
+  reviewsReceived  Review[]            @relation("ReviewSubject")
+  flagsReported    Flag[]
+
+  @@map("users")
+}
+
+model Skill {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique
+  category    String
+  description String?
+
+  userSkills UserSkill[]
+  requests   SkillRequest[]
+
+  @@map("skills")
+}
+
+model UserSkill {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String      @map("user_id") @db.Uuid
+  skillId     String      @map("skill_id") @db.Uuid
+  proficiency Proficiency
+  type        SkillType
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, skillId, type])
+  @@map("user_skills")
+}
+
+// Matching
+
+model SkillRequest {
+  id           String             @id @default(uuid()) @db.Uuid
+  requesterId  String             @map("requester_id") @db.Uuid
+  targetUserId String             @map("target_user_id") @db.Uuid
+  skillId      String             @map("skill_id") @db.Uuid
+  status       SkillRequestStatus @default(PENDING)
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  // TODO(team): swaps are reciprocal. Consider offeredSkillId + requestedSkillId.
+
+  requester  User         @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetUser User         @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  skill      Skill        @relation(fields: [skillId], references: [id])
+  session    SwapSession?
+
+  @@index([targetUserId, status])
+  @@map("skill_requests")
+}
+
+// Communication
+// TODO(team): Conversation and Message models for in-app chat.
+
+// Sessions and reviews.
+// Named SwapSession, not Session, to keep it distinct from the login session.
+
+model SwapSession {
+  id        String            @id @default(uuid()) @db.Uuid
+  requestId String            @unique @map("request_id") @db.Uuid
+  startedAt DateTime          @default(now()) @map("started_at")
+  endedAt   DateTime?         @map("ended_at")
+  status    SwapSessionStatus @default(ACTIVE)
+
+  request     SkillRequest        @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  assignments SessionAssignment[]
+  reviews     Review[]
+  flags       Flag[]
+
+  @@map("swap_sessions")
+}
+
+model SessionAssignment {
+  id          String    @id @default(uuid()) @db.Uuid
+  sessionId   String    @map("session_id") @db.Uuid
+  givenById   String    @map("given_by") @db.Uuid
+  description String
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  session SwapSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  givenBy User            @relation(fields: [givenById], references: [id])
+  uploads SessionUpload[]
+
+  @@map("session_assignments")
+}
+
+model SessionUpload {
+  id           String   @id @default(uuid()) @db.Uuid
+  assignmentId String   @map("assignment_id") @db.Uuid
+  uploadedById String   @map("uploaded_by") @db.Uuid
+  filePath     String   @map("file_path")
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+
+  assignment SessionAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  uploadedBy User              @relation(fields: [uploadedById], references: [id])
+
+  @@map("session_uploads")
+}
+
+model Review {
+  id             String     @id @default(uuid()) @db.Uuid
+  sessionId      String     @map("session_id") @db.Uuid
+  reviewerId     String     @map("reviewer_id") @db.Uuid
+  reviewedUserId String     @map("reviewed_user_id") @db.Uuid
+  role           ReviewRole
+  rating         Int // 1-5, enforced in the API with zod
+  comment        String?
+  createdAt      DateTime   @default(now()) @map("created_at")
+
+  session      SwapSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  reviewer     User        @relation("ReviewAuthor", fields: [reviewerId], references: [id])
+  reviewedUser User        @relation("ReviewSubject", fields: [reviewedUserId], references: [id])
+
+  @@unique([sessionId, reviewerId])
+  @@map("reviews")
+}
+
+model Flag {
+  id           String     @id @default(uuid()) @db.Uuid
+  sessionId    String     @map("session_id") @db.Uuid
+  reportedById String     @map("reported_by") @db.Uuid
+  reason       String
+  status       FlagStatus @default(OPEN)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  resolvedAt   DateTime?  @map("resolved_at")
+
+  session    SwapSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  reportedBy User        @relation(fields: [reportedById], references: [id])
+
+  @@map("flags")
+}

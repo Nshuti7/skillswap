@@ -1,0 +1,29 @@
+node_modules/
+dist/
+build/
+
+# Env files. Real secrets never get committed; .env.example does.
+.env
+.env.*
+!.env.example
+
+# Build artefacts
+*.log
+*.tsbuildinfo
+.expo/
+web-build/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local AI/agent config, not part of the project
+.claude/
+.cursor/
+.github/copilot-instructions.md
+claude.md
+CLAUDE.md
+AGENTS.md

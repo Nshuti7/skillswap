@@ -1,0 +1,14 @@
+# Normalise line endings so Windows and macOS checkouts do not fight.
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# Generated. Collapsed in pull request diffs.
+pnpm-lock.yaml linguist-generated=true -diff
