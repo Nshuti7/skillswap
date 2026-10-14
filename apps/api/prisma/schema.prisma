@@ -74,14 +74,17 @@ model User {
 
   // TODO(team): IUEA verification (isVerified / studentId). Pilot is IUEA-only.
 
-  skills           UserSkill[]
-  sentRequests     SkillRequest[]      @relation("RequestRequester")
-  receivedRequests SkillRequest[]      @relation("RequestTarget")
-  assignmentsGiven SessionAssignment[]
-  uploads          SessionUpload[]
-  reviewsGiven     Review[]            @relation("ReviewAuthor")
-  reviewsReceived  Review[]            @relation("ReviewSubject")
-  flagsReported    Flag[]
+  skills                        UserSkill[]
+  sentRequests                  SkillRequest[]      @relation("RequestRequester")
+  receivedRequests              SkillRequest[]      @relation("RequestTarget")
+  conversationsAsParticipantOne Conversation[]      @relation("ConversationParticipantOne")
+  conversationsAsParticipantTwo Conversation[]      @relation("ConversationParticipantTwo")
+  messagesSent                  Message[]
+  assignmentsGiven              SessionAssignment[]
+  uploads                       SessionUpload[]
+  reviewsGiven                  Review[]            @relation("ReviewAuthor")
+  reviewsReceived               Review[]            @relation("ReviewSubject")
+  flagsReported                 Flag[]
 
   @@map("users")
 }
@@ -126,17 +129,66 @@ model SkillRequest {
 
   // TODO(team): swaps are reciprocal. Consider offeredSkillId + requestedSkillId.
 
-  requester  User         @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  targetUser User         @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
-  skill      Skill        @relation(fields: [skillId], references: [id])
-  session    SwapSession?
+  requester    User          @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetUser   User          @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  skill        Skill         @relation(fields: [skillId], references: [id])
+  session      SwapSession?
+  conversation Conversation?
 
   @@index([targetUserId, status])
   @@map("skill_requests")
 }
 
 // Communication
-// TODO(team): Conversation and Message models for in-app chat.
+//
+// SS-12 decisions:
+// 1. Tied to swap: a conversation belongs to exactly one SkillRequest
+//    (requestId required + unique, created when the request is accepted).
+//    No free messaging between arbitrary users for the pilot (spam/abuse).
+//    SwapSession is 1-1 with SkillRequest, so linking the request covers
+//    the session without a redundant second FK.
+// 2. Two participants only: participantOneId / participantTwoId FKs to User.
+//    No ConversationParticipant join table. Matches the MVP; group chat
+//    would need a join-table migration later. The service layer must enforce
+//    participantOneId != participantTwoId and that both match the request's
+//    requester/target.
+// 3. No soft delete on messages for the pilot: messages are hard-deleted via
+//    Cascade when the conversation goes away. Revisit if moderation needs it.
+//    The service layer must touch Conversation.updatedAt on each new message
+//    so "my conversations, most recent first" stays correct.
+
+model Conversation {
+  id               String   @id @default(uuid()) @db.Uuid
+  requestId        String   @unique @map("request_id") @db.Uuid
+  participantOneId String   @map("participant_one_id") @db.Uuid
+  participantTwoId String   @map("participant_two_id") @db.Uuid
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  request        SkillRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  participantOne User         @relation("ConversationParticipantOne", fields: [participantOneId], references: [id], onDelete: Cascade)
+  participantTwo User         @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id], onDelete: Cascade)
+  messages       Message[]
+
+  @@index([participantOneId, updatedAt])
+  @@index([participantTwoId, updatedAt])
+  @@map("conversations")
+}
+
+model Message {
+  id             String    @id @default(uuid()) @db.Uuid
+  conversationId String    @map("conversation_id") @db.Uuid
+  senderId       String    @map("sender_id") @db.Uuid
+  body           String
+  createdAt      DateTime  @default(now()) @map("created_at")
+  readAt         DateTime? @map("read_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
 
 // Sessions and reviews.
 // Named SwapSession, not Session, to keep it distinct from the login session.
