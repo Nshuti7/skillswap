@@ -1,0 +1,47 @@
+.checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkbox__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+/* 20px with a real border. The mockup used a 25px flat grey square sharing
+   the input fill, so it read as another field rather than a control. */
+.checkbox__input {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--purple-text);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.checkbox__input:focus-visible {
+  outline: 2px solid var(--purple-text);
+  outline-offset: 2px;
+}
+
+.checkbox__label {
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-600);
+  cursor: pointer;
+}
+
+.checkbox__label a {
+  color: var(--purple-text);
+  font-weight: 600;
+}
+
+.checkbox__error {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--danger);
+}
