@@ -48,10 +48,10 @@
   --warning: #c2630a;
   --info: #1d4ed8;
 
-  /* Type. The StyleGuide headings use a rounded display face; the Register
-     frame reports Inter. Confirm the intended display face with design, then
-     change --font-display in one place. */
-  --font-display: "Baloo 2", "Poppins", system-ui, sans-serif;
+  /* Type. Confirmed from the Figma file: the StyleGuide headings are Nunito,
+     body text is Inter. The Register frame reported Inter throughout, which is
+     why the original mockup's headings did not match the StyleGuide. */
+  --font-display: "Nunito", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --text-xs: 0.75rem;
