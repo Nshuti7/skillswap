@@ -1,0 +1,81 @@
+/*
+ * Design tokens, from the Color Palette and StyleGuide frames in Figma
+ * (file 2Q7uroSOOzHcM0UhsIzdVS).
+ *
+ * Two values deliberately differ from the Register mockup. Both are contrast
+ * fixes, measured from the exported frame:
+ *
+ *   --purple-text (#7C3AED) replaces #8E59ED for text, links and button fills.
+ *   #8E59ED gives 4.37:1 on white, which fails WCAG AA for normal text in
+ *   both directions. The CTA label is 14px, so it fails outright rather than
+ *   borderline. #7C3AED gives 5.70:1 and passes.
+ *
+ *   --surface-invert (#1A1F2E) is the split-panel background instead of the
+ *   brand purple. The palette defines purple as an accent for "highlights,
+ *   links, icons", not a surface, and the mockup used the same hex for the
+ *   panel and the primary button, so the CTA had no colour separation from
+ *   decoration. Navy gives 16.41:1 with white.
+ *
+ * #8E59ED is kept as --purple-brand for large display text and non-text UI,
+ * where 3:1 is the bar and it passes.
+ */
+
+:root {
+  /* Brand */
+  --purple-brand: #8e59ed; /* large text and non-text only */
+  --purple-text: #7c3aed; /* text, links, button fills */
+  --purple-deep: #6d28d9; /* hover / pressed */
+  --purple-soft: #b794f6; /* secondary accents, tags */
+  --green-skill: #a5d88f; /* completed, positive, skill states */
+  --cream: #faf0e6; /* warm sections and cards */
+
+  /* Ink */
+  --ink-900: #0f1420; /* high emphasis headings */
+  --ink-800: #1a1f2e; /* primary text, nav, dark surfaces */
+  --ink-600: #2e3a56; /* secondary text, supporting UI */
+  --ink-400: #6b7280; /* placeholders, metadata, captions */
+
+  /* Surfaces */
+  --surface: #ffffff; /* main backgrounds, cards, forms */
+  --surface-subtle: #f7f8fa; /* subtle fills, disabled areas */
+  --surface-invert: #1a1f2e; /* the split panel */
+  --border: #d8dce3; /* input outlines, dividers */
+  --border-strong: #b6bdc9;
+
+  /* Functional */
+  --success: #15803d;
+  --danger: #b91c1c;
+  --warning: #c2630a;
+  --info: #1d4ed8;
+
+  /* Type. The StyleGuide headings use a rounded display face; the Register
+     frame reports Inter. Confirm the intended display face with design, then
+     change --font-display in one place. */
+  --font-display: "Baloo 2", "Poppins", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.938rem;
+  --text-3xl: 2.438rem;
+  --text-4xl: 3.063rem;
+
+  /* 4px base unit */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 999px;
+
+  --focus-ring: 0 0 0 3px rgba(124, 58, 237, 0.35);
+}

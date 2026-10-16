@@ -1,22 +1,8 @@
-import { SkillLevel } from '@skillswap/shared'
-import './App.css'
+import { RegisterPage } from './pages/RegisterPage'
 
+// TODO(SS-5): add routing once there is more than one screen.
 function App() {
-  return (
-    <main className="app">
-      <h1>SkillSwap</h1>
-      <p className="tagline">Skills are the new currency.</p>
-
-      <section>
-        <h2>Skill levels</h2>
-        <ul>
-          {Object.values(SkillLevel).map((level) => (
-            <li key={level}>{level}</li>
-          ))}
-        </ul>
-      </section>
-    </main>
-  )
+  return <RegisterPage />
 }
 
 export default App
