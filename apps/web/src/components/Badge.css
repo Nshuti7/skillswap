@@ -1,0 +1,31 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.48px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Two inks are darker than the mockup. #d97706 on its tint is 3.4:1 and
+   #16a34a is 2.9:1; both fail AA for 12px text. */
+.badge--violet {
+  background: var(--violet-badge);
+  color: var(--purple-text);
+}
+.badge--amber {
+  background: var(--amber-badge);
+  color: var(--amber-ink);
+}
+.badge--green {
+  background: var(--green-badge);
+  color: var(--green-ink);
+}
+.badge--slate {
+  background: var(--slate-badge);
+  color: var(--ink-600);
+}

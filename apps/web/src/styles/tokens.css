@@ -48,9 +48,34 @@
   --warning: #c2630a;
   --info: #1d4ed8;
 
-  /* Type. Confirmed from the Figma file: the StyleGuide headings are Nunito,
-     body text is Inter. The Register frame reported Inter throughout, which is
-     why the original mockup's headings did not match the StyleGuide. */
+  /* App surfaces, from the Dashboard frame in Figma. */
+  --app-bg: #f8f7fa;
+  --sidebar: #182030;
+  --sidebar-raised: #2e3a56; /* active nav row, community note */
+  --sidebar-accent: #a78bff; /* active indicator, brand text */
+  --muted: #64748b; /* secondary text on light surfaces */
+  --hairline: #e5e7eb;
+
+  /* Status pairs: tint, border, ink */
+  --violet-tint: #f2ecfe;
+  --violet-line: #d7c6fa;
+  --violet-badge: #eee6fd;
+  --amber-tint: #f6ede7;
+  --amber-badge: #fbf0e1;
+  --amber-ink: #b45309; /* darkened from the mockup's #d97706 for AA */
+  --green-tint: #f0f8ed;
+  --green-line: #d6eecb;
+  --green-badge: #e8f5e4;
+  --green-ink: #15803d; /* darkened from #16a34a for AA on the tint */
+  --slate-badge: #f1f5f9;
+
+  --card-radius: 16px;
+  --card-shadow: 0 8px 24px -8px rgba(24, 32, 48, 0.07);
+
+  /* Type. Three faces, confirmed by reading the font names out of the file:
+     Righteous for the brand mark and page titles, Nunito for content,
+     Inter for controls (nav, buttons, inputs). */
+  --font-brand: "Righteous", system-ui, sans-serif;
   --font-display: "Nunito", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
