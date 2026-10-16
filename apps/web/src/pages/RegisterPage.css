@@ -19,24 +19,26 @@
   overflow: hidden;
 }
 
-/* A restrained purple wash, so the panel still reads as branded without the
-   accent competing with the button. */
+/* The auth background pattern, exported from Background1 in Figma. That file
+   defines two patterns: Background1 for auth, Background2 for the app itself.
+   Held at half opacity because the artwork is drawn for a full 1440 frame, and
+   cropping it into this narrower column lands on the thickest part of the green
+   wave, which then reads as a shape rather than as texture. */
 .auth__aside::after {
   content: '';
   position: absolute;
-  right: -20%;
-  bottom: -25%;
-  width: 70%;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(142, 89, 237, 0.4), transparent 70%);
+  inset: 0;
+  background-image: url('../assets/auth-pattern.svg');
+  background-size: cover;
+  background-position: left center;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .auth__logo {
   position: relative;
   z-index: 1;
-  width: 132px;
+  width: 150px;
   height: auto;
 }
 

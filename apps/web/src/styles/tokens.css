@@ -10,7 +10,7 @@
  *   both directions. The CTA label is 14px, so it fails outright rather than
  *   borderline. #7C3AED gives 5.70:1 and passes.
  *
- *   --surface-invert (#1A1F2E) is the split-panel background instead of the
+ *   --surface-invert (#182030) is the split-panel background instead of the
  *   brand purple. The palette defines purple as an accent for "highlights,
  *   links, icons", not a surface, and the mockup used the same hex for the
  *   panel and the primary button, so the CTA had no colour separation from
@@ -38,7 +38,7 @@
   /* Surfaces */
   --surface: #ffffff; /* main backgrounds, cards, forms */
   --surface-subtle: #f7f8fa; /* subtle fills, disabled areas */
-  --surface-invert: #1a1f2e; /* the split panel */
+  --surface-invert: #182030; /* auth ground, from Background1 in Figma */
   --border: #d8dce3; /* input outlines, dividers */
   --border-strong: #b6bdc9;
 

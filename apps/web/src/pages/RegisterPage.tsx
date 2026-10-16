@@ -6,7 +6,9 @@ import arrowRight from '../assets/icon-arrow-right.svg'
 import check from '../assets/icon-check.svg'
 import eye from '../assets/icon-eye.svg'
 import lock from '../assets/icon-lock.svg'
-import logo from '../assets/logo.png'
+// Light-on-dark lockup, taken from the Background1 frame in Figma. The default
+// logo.png is drawn for light surfaces and goes muddy on the navy panel.
+import logo from '../assets/logo-light.png'
 import './RegisterPage.css'
 
 type Errors = Partial<Record<'name' | 'email' | 'password' | 'terms', string>>
