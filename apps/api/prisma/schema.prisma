@@ -72,11 +72,19 @@ model User {
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
-  // TODO(team): IUEA verification (isVerified / studentId). Pilot is IUEA-only.
+  // IUEA verification (SS-13). Pilot is IUEA-only.
+  // isVerified flips to true once the student ID is confirmed.
+  // studentId is unique so one IUEA ID cannot back two accounts.
+  isVerified Boolean   @default(false) @map("is_verified")
+  studentId  String?   @unique @map("student_id")
+  verifiedAt DateTime? @map("verified_at")
 
   skills           UserSkill[]
   sentRequests     SkillRequest[]      @relation("RequestRequester")
   receivedRequests SkillRequest[]      @relation("RequestTarget")
+  conversationsAsA Conversation[]      @relation("ConversationUserA")
+  conversationsAsB Conversation[]      @relation("ConversationUserB")
+  messagesSent     Message[]
   assignmentsGiven SessionAssignment[]
   uploads          SessionUpload[]
   reviewsGiven     Review[]            @relation("ReviewAuthor")
@@ -92,8 +100,9 @@ model Skill {
   category    String
   description String?
 
-  userSkills UserSkill[]
-  requests   SkillRequest[]
+  userSkills          UserSkill[]
+  offeredInRequests   SkillRequest[] @relation("RequestOfferedSkill")
+  requestedInRequests SkillRequest[] @relation("RequestRequestedSkill")
 
   @@map("skills")
 }
@@ -114,29 +123,66 @@ model UserSkill {
 }
 
 // Matching
+// Swaps are reciprocal (SS-11): the requester offers to teach one skill
+// and asks to learn another from the target user.
+// API rule: offeredSkillId and requestedSkillId must differ.
 
 model SkillRequest {
-  id           String             @id @default(uuid()) @db.Uuid
-  requesterId  String             @map("requester_id") @db.Uuid
-  targetUserId String             @map("target_user_id") @db.Uuid
-  skillId      String             @map("skill_id") @db.Uuid
-  status       SkillRequestStatus @default(PENDING)
-  createdAt    DateTime           @default(now()) @map("created_at")
-  updatedAt    DateTime           @updatedAt @map("updated_at")
+  id               String             @id @default(uuid()) @db.Uuid
+  requesterId      String             @map("requester_id") @db.Uuid
+  targetUserId     String             @map("target_user_id") @db.Uuid
+  offeredSkillId   String             @map("offered_skill_id") @db.Uuid
+  requestedSkillId String             @map("requested_skill_id") @db.Uuid
+  status           SkillRequestStatus @default(PENDING)
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
 
-  // TODO(team): swaps are reciprocal. Consider offeredSkillId + requestedSkillId.
-
-  requester  User         @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  targetUser User         @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
-  skill      Skill        @relation(fields: [skillId], references: [id])
-  session    SwapSession?
+  requester      User         @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetUser     User         @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  offeredSkill   Skill        @relation("RequestOfferedSkill", fields: [offeredSkillId], references: [id])
+  requestedSkill Skill        @relation("RequestRequestedSkill", fields: [requestedSkillId], references: [id])
+  session        SwapSession?
 
   @@index([targetUserId, status])
+  @@index([requesterId, status])
   @@map("skill_requests")
 }
 
-// Communication
-// TODO(team): Conversation and Message models for in-app chat.
+// Communication (SS-12)
+// One conversation per pair of users. The API must store the pair in a
+// fixed order (userAId < userBId) so the unique constraint catches
+// duplicates regardless of who started the chat.
+
+model Conversation {
+  id        String   @id @default(uuid()) @db.Uuid
+  userAId   String   @map("user_a_id") @db.Uuid
+  userBId   String   @map("user_b_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userA    User      @relation("ConversationUserA", fields: [userAId], references: [id], onDelete: Cascade)
+  userB    User      @relation("ConversationUserB", fields: [userBId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([userAId, userBId])
+  @@index([userBId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String    @id @default(uuid()) @db.Uuid
+  conversationId String    @map("conversation_id") @db.Uuid
+  senderId       String    @map("sender_id") @db.Uuid
+  body           String
+  createdAt      DateTime  @default(now()) @map("created_at")
+  readAt         DateTime? @map("read_at")
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
 
 // Sessions and reviews.
 // Named SwapSession, not Session, to keep it distinct from the login session.
