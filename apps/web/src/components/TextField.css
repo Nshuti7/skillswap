@@ -1,0 +1,96 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-600);
+}
+
+/* White fill with a visible outline, per the StyleGuide input component.
+   The mockup used a solid grey fill with no border, which is the usual
+   convention for a disabled control, so the fields read as uneditable. */
+.field__box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 48px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.field__box:focus-within {
+  border-color: var(--purple-text);
+  box-shadow: var(--focus-ring);
+}
+
+.field__box--error {
+  border-color: var(--danger);
+}
+
+.field__box--error:focus-within {
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.3);
+}
+
+.field__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--ink-800);
+}
+
+.field__input::placeholder {
+  color: var(--ink-400);
+}
+
+.field__icon,
+.field__trailing {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--ink-400);
+}
+
+.field__trailing button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-right: calc(var(--space-4) * -1);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ink-400);
+  border-radius: var(--radius-sm);
+}
+
+.field__trailing button:focus-visible {
+  outline: 2px solid var(--purple-text);
+  outline-offset: -2px;
+}
+
+.field__hint,
+.field__error {
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.field__hint {
+  color: var(--ink-400);
+}
+
+.field__error {
+  color: var(--danger);
+  font-weight: 500;
+}

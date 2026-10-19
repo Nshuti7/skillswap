@@ -1,0 +1,157 @@
+.auth {
+  display: grid;
+  /* The mockup gave the panel 610 of 1440 (42%) and left the form crowded
+     against the right edge. 5fr/7fr gives the form the room it needs. */
+  grid-template-columns: 5fr 7fr;
+  min-height: 100vh;
+}
+
+/* Navy, not the brand purple. See the note in tokens.css. */
+.auth__aside {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-8);
+  padding: var(--space-7);
+  background: var(--surface-invert);
+  color: #fff;
+  overflow: hidden;
+}
+
+/* The auth background pattern, exported from Background1 in Figma. That file
+   defines two patterns: Background1 for auth, Background2 for the app itself.
+   Held at half opacity because the artwork is drawn for a full 1440 frame, and
+   cropping it into this narrower column lands on the thickest part of the green
+   wave, which then reads as a shape rather than as texture. */
+.auth__aside::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('../assets/auth-pattern.svg');
+  background-size: cover;
+  background-position: left center;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.auth__logo {
+  position: relative;
+  z-index: 1;
+  width: 150px;
+  height: auto;
+}
+
+.auth__pitch {
+  position: relative;
+  z-index: 1;
+  max-width: 34ch;
+  margin-bottom: var(--space-8);
+}
+
+.auth__eyebrow {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--purple-soft);
+}
+
+.auth__headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, var(--text-4xl));
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.auth__sub {
+  margin: var(--space-5) 0 0;
+  font-size: var(--text-base);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.auth__panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-7) var(--space-6);
+  background: var(--surface);
+}
+
+.auth__form-wrap {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth__welcome {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--purple-text);
+}
+
+.auth__title {
+  margin: 0 0 var(--space-7);
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 2.6vw, var(--text-3xl));
+  line-height: 1.15;
+  color: var(--ink-900);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.auth__trust {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-5) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-400);
+}
+
+/* Sits directly under the form instead of being pinned to the bottom of the
+   viewport, which left ~190px of dead space in the mockup. */
+.auth__alt {
+  margin: var(--space-6) 0 0;
+  font-size: var(--text-base);
+  color: var(--ink-600);
+}
+
+.auth__alt a,
+.auth__trust a {
+  color: var(--purple-text);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .auth {
+    grid-template-columns: 1fr;
+  }
+
+  .auth__aside {
+    gap: var(--space-6);
+    padding: var(--space-5);
+  }
+
+  .auth__pitch {
+    margin-bottom: 0;
+    max-width: none;
+  }
+
+  .auth__headline {
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+  }
+
+  .auth__panel {
+    padding: var(--space-6) var(--space-4);
+  }
+}

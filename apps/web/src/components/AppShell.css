@@ -1,0 +1,50 @@
+.shell {
+  display: flex;
+  align-items: stretch;
+  min-height: 100vh;
+  background: var(--app-bg);
+}
+
+.shell__main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Background2 in Figma is the pattern for the app itself, as distinct from
+   Background1 which is the auth ground. Pinned to the viewport and held well
+   back so content stays legible over it. */
+.shell__main::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 0 240px;
+  background-image: url('../assets/app-pattern.svg');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.shell__main > * {
+  position: relative;
+  z-index: 1;
+}
+
+.shell__content {
+  flex: 1;
+  padding: 28px var(--space-6);
+  overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .shell__main::before {
+    inset: 0;
+  }
+}

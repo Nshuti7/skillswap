@@ -1,0 +1,56 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 48px;
+  padding: var(--space-3) var(--space-5);
+  border: 0;
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--purple-deep);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* --purple-text, not --purple-brand. The label is 14-16px, and white on
+   #8E59ED is 4.37:1, under the 4.5:1 AA floor for text that size. */
+.btn--primary {
+  background: var(--purple-text);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--purple-deep);
+}
+
+.btn--secondary {
+  background: var(--surface);
+  color: var(--ink-600);
+  border: 1px solid var(--border);
+}
+
+.btn--secondary:hover:not(:disabled) {
+  background: var(--surface-subtle);
+}
+
+.btn__trailing {
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn__trailing img {
+  display: block;
+}
