@@ -93,3 +93,29 @@ export function IconSettings({ size = 20, className }: Props) {
     </svg>
   )
 }
+
+export function IconPlus({ size = 20, className }: Props) {
+  return (
+    <svg viewBox="0 0 23 23" className={className} {...base(size)}>
+      <path d="M11.5 5.03v12.94M5.03 11.5h12.94" />
+    </svg>
+  )
+}
+
+export function IconCheck({ size = 20, className }: Props) {
+  return (
+    <svg viewBox="0 0 23 23" className={className} {...base(size)}>
+      <path d="m5.03 11.86 4.67 4.67 8.27-10.06" />
+    </svg>
+  )
+}
+
+export function IconPeople({ size = 20, className }: Props) {
+  return (
+    <svg viewBox="0 0 23 23" className={className} {...base(size)}>
+      <circle cx="9.34" cy="7.19" r="3.24" />
+      <path d="M2.88 19.41a6.47 6.47 0 0 1 12.94 0" />
+      <path d="M16.17 4.31a3.24 3.24 0 0 1 0 5.75M18.33 13.3a6.48 6.48 0 0 1 3.8 5.9" />
+    </svg>
+  )
+}

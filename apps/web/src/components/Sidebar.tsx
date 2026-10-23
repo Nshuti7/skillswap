@@ -13,7 +13,7 @@ import logo from '../assets/logo-light.png'
 import './Sidebar.css'
 
 const primary = [
-  { to: '/', label: 'Dashboard', Icon: IconDashboard, end: true },
+  { to: '/dashboard', label: 'Dashboard', Icon: IconDashboard, end: true },
   { to: '/find', label: 'Find Skills', Icon: IconSearch },
   { to: '/swaps', label: 'My Swaps', Icon: IconSwap },
   { to: '/messages', label: 'Messages', Icon: IconMessage },
@@ -37,7 +37,7 @@ export function Sidebar() {
         {primary.map(({ to, label, Icon, end }) => (
           <NavLink key={to} to={to} end={end} className="navrow">
             <span className="navrow__indicator" aria-hidden />
-            <Icon size={20} className="navrow__icon" />
+            <Icon size={18} className="navrow__icon" />
             <span>{label}</span>
           </NavLink>
         ))}
@@ -48,7 +48,7 @@ export function Sidebar() {
           {secondary.map(({ to, label, Icon }) => (
             <NavLink key={to} to={to} className="navrow">
               <span className="navrow__indicator" aria-hidden />
-              <Icon size={20} className="navrow__icon" />
+              <Icon size={18} className="navrow__icon" />
               <span>{label}</span>
             </NavLink>
           ))}

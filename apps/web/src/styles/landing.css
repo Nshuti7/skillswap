@@ -1,0 +1,222 @@
+/*
+ * The public landing page, from the Auth/Landing frame in Figma (150:7).
+ *
+ * The mockup places everything by absolute coordinates on a 1440 frame. Here
+ * the page is a two column hero inside a centred container, so it holds at
+ * laptop widths as well as on the 1440 the frame was drawn at.
+ */
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+.landing__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding: var(--space-4) 0;
+}
+
+.landing__logo {
+  width: 120px;
+  height: auto;
+}
+
+.landing__bar-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.landing__login {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--ink-800);
+  text-decoration: none;
+}
+
+.landing__login:hover {
+  color: var(--purple-text);
+}
+
+.landing__hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--space-8);
+  flex: 1;
+  padding: var(--space-7) 0 var(--space-8);
+}
+
+/* --purple-brand, not --purple-text. This is 45px and up, where the lighter
+   purple clears 3:1 and keeps the display weight the mockup has. The rule
+   is in tokens.css: #8E59ED for large text only. */
+.landing__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 5vw, 4.25rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--purple-brand);
+}
+
+.landing__lede {
+  max-width: 46ch;
+  margin: var(--space-6) 0 0;
+  font-size: var(--text-lg);
+  line-height: 1.55;
+  color: var(--ink-600);
+}
+
+.landing__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin-top: var(--space-7);
+}
+
+.landing__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-7);
+  margin: var(--space-7) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing__trust li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-600);
+}
+
+.landing__art {
+  position: relative;
+  margin: 0;
+  /* Room for the two cards, which hang past the illustration on both sides. */
+  padding: var(--space-8) 0;
+}
+
+.landing__illustration {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.landing__card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: max-content;
+  max-width: 320px;
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--card-radius);
+  background: var(--surface-subtle);
+  box-shadow: var(--card-shadow);
+}
+
+.landing__card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: var(--violet-tint);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--purple-text);
+}
+
+.landing__card-eyebrow,
+.landing__card-skill {
+  display: block;
+}
+
+.landing__card-eyebrow {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-400);
+}
+
+.landing__card-skill {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink-800);
+}
+
+/* The cards overlap the illustration only once there is width to do it in.
+   Below 1100px they fall back into normal flow under the picture, where
+   overlapping would cover the two people the page is about. */
+@media (min-width: 1100px) {
+  .landing__cards {
+    display: contents;
+  }
+
+  .landing__card {
+    position: absolute;
+    z-index: 1;
+  }
+
+  /* Pinned to the edges of the art column rather than hung outside it: a
+     negative offset here is what put a horizontal scrollbar on the page. */
+  .landing__card--teach {
+    top: 0;
+    left: 0;
+    transform: rotate(-5deg);
+  }
+
+  .landing__card--learn {
+    right: 0;
+    bottom: 0;
+    transform: rotate(3deg);
+  }
+}
+
+@media (max-width: 1099px) {
+  .landing__cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+  }
+}
+
+@media (max-width: 900px) {
+  .landing__hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    padding-bottom: var(--space-7);
+  }
+
+  /* Picture first in source would push the headline below the fold on a
+     phone, so the copy stays first and the art follows. */
+  .landing__art {
+    order: 2;
+    padding: 0;
+  }
+
+  .landing__actions .btn {
+    flex: 1 1 220px;
+  }
+}

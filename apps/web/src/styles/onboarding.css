@@ -1,0 +1,270 @@
+/*
+ * The skill picker, from the three "Skills you can teach" frames in Figma
+ * (351:219, 394:19, 397:144). One card floating on the patterned ground,
+ * the same card for both questions.
+ */
+
+.onboarding {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-6);
+  background-color: var(--surface-invert);
+}
+
+/* Background2 from Figma, the same artwork the app shell uses. There it sits
+   on a near-white ground at low opacity; here it is the full-strength blobs
+   on navy, which is how the onboarding frames draw it. */
+.onboarding::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url('../assets/app-pattern.svg');
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.onboarding__card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  padding: var(--space-6) var(--space-7) var(--space-7);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: 0 24px 60px -20px rgba(15, 20, 32, 0.45);
+}
+
+.onboarding__progress-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.onboarding__progress-label,
+.onboarding__progress-count {
+  margin: 0;
+  font-size: var(--text-base);
+  color: var(--ink-800);
+}
+
+.onboarding__progress-count {
+  font-size: var(--text-sm);
+  color: var(--ink-400);
+}
+
+.onboarding__track {
+  height: 10px;
+  margin-top: var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--border);
+  overflow: hidden;
+}
+
+.onboarding__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #22c55e;
+  transition: width 250ms ease;
+}
+
+.onboarding__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-6) 0 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--purple-text);
+}
+
+.onboarding__eyebrow img {
+  width: auto;
+  height: 34px;
+}
+
+.onboarding__title {
+  margin: var(--space-5) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3vw, var(--text-3xl));
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--purple-text);
+}
+
+.onboarding__lede {
+  margin: var(--space-4) 0 0;
+  font-size: var(--text-base);
+  color: var(--ink-600);
+}
+
+.onboarding__search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: var(--violet-tint);
+  color: var(--ink-400);
+}
+
+.onboarding__search:focus-within {
+  border-color: var(--purple-text);
+  box-shadow: var(--focus-ring);
+}
+
+.onboarding__search input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-3) 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink-800);
+}
+
+.onboarding__search input:focus {
+  outline: none;
+}
+
+.onboarding__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4) var(--space-5);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--ink-800);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.tile:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-subtle);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--purple-deep);
+  outline-offset: 2px;
+}
+
+.tile__mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--slate-badge);
+  color: var(--ink-800);
+}
+
+.tile--on {
+  border-color: var(--green-line);
+  background: var(--green-tint);
+}
+
+.tile--on .tile__mark {
+  background: #22c55e;
+  color: #fff;
+}
+
+.onboarding__skeleton {
+  height: 50px;
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.onboarding__empty {
+  margin: var(--space-5) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-400);
+}
+
+/* --success, not the bar's #22C55E. This is 16px text on white, where the
+   brighter green measures 2.3:1 and fails AA outright. */
+.onboarding__add {
+  margin-top: var(--space-5);
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--success);
+  cursor: pointer;
+}
+
+.onboarding__add:hover {
+  text-decoration: underline;
+}
+
+.onboarding__foot {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.onboarding__status {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--ink-400);
+}
+
+.onboarding__foot .btn {
+  width: 300px;
+}
+
+@media (max-width: 760px) {
+  .onboarding {
+    padding: var(--space-4);
+  }
+
+  .onboarding__card {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+
+  .onboarding__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding__foot {
+    align-items: stretch;
+    margin-top: var(--space-7);
+  }
+
+  .onboarding__status {
+    text-align: right;
+  }
+
+  .onboarding__foot .btn {
+    width: 100%;
+  }
+}

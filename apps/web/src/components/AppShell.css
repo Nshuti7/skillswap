@@ -33,6 +33,21 @@
   z-index: 1;
 }
 
+/* The top bar sticks, because the sidebar already does: with only one of
+   them pinned the frame half-moves as you scroll, which reads as a bug.
+   Search is the one global action outside the nav, and the dashboard runs
+   well past a screen, so it has to stay reachable.
+ *
+ * It lives here rather than in TopBar.css because the rule above is what it
+ * has to beat. Both selectors have the same weight, so position: relative
+ * would win on order alone; naming the child raises this one above it. */
+.shell__main > .topbar {
+  position: sticky;
+  top: 0;
+  /* Over .shell__content, which the rule above also puts on layer 1. */
+  z-index: 2;
+}
+
 .shell__content {
   flex: 1;
   padding: 28px var(--space-6);

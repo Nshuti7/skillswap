@@ -1,23 +1,29 @@
 /* Sticky and viewport-tall, so Help, Settings and the community note stay
-   anchored to the bottom instead of being pushed down by page scroll. */
+   anchored to the bottom instead of being pushed down by page scroll.
+ *
+ * overflow is hidden, not auto: a nav of eight fixed rows is meant to be
+ * seen whole, and a scrollbar inside it is both ugly and a sign the rows
+ * have grown too big. Everything below is sized so the column fits without
+ * one, and the note drops out on short viewports before anything you can
+ * click would be cut off. */
 .sidebar {
   position: sticky;
   top: 0;
   align-self: flex-start;
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
   width: 240px;
   height: 100vh;
   flex-shrink: 0;
-  padding: var(--space-6) var(--space-4);
+  padding: var(--space-5) var(--space-4);
   background: var(--sidebar);
   color: #fff;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .sidebar__brand img {
-  width: 106px;
+  width: 92px;
   height: auto;
   display: block;
   margin-left: var(--space-2);
@@ -34,7 +40,7 @@
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .navrow {
@@ -42,8 +48,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 40px;
-  padding: var(--space-2) var(--space-3);
+  min-height: 34px;
+  padding: var(--space-1) var(--space-3);
   border-radius: 6px;
   font-family: var(--font-sans);
   font-size: var(--text-sm);
@@ -89,15 +95,15 @@
 }
 
 .sidebar__note {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3);
   background: var(--sidebar-raised);
   border-radius: 10px;
 }
 
 .sidebar__note-title {
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--space-1);
   font-family: var(--font-brand);
-  font-size: 18px;
+  font-size: 16px;
   color: var(--sidebar-accent);
 }
 
@@ -107,4 +113,15 @@
   font-size: var(--text-xs);
   line-height: 1.35;
   color: rgba(255, 255, 255, 0.72);
+}
+
+/* The note is the only decorative thing in the column, so it is what gives
+   way when the viewport is too short for all of it. Losing it keeps Help
+   and Settings reachable, which a scrollbar was the old way of doing.
+   Measured: the column needs 564px with the note and 447px without, so this
+   drops it just below where it stops fitting rather than long before. */
+@media (max-height: 600px) {
+  .sidebar__note {
+    display: none;
+  }
 }

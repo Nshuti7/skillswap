@@ -55,15 +55,27 @@
   display: block;
 }
 
-/* Google sign-in is a link rather than a button, because it leaves the SPA
-   entirely. See GoogleButton.tsx. These rules only undo what an anchor brings
-   with it; everything else comes from .btn and .btn--secondary. */
-.btn--google {
+/* Several of these are anchors rather than buttons: Google sign-in leaves the
+   SPA entirely, and the landing CTAs are navigation. The underline a browser
+   puts on a link fights the button surface it is sitting on. */
+a.btn {
   text-decoration: none;
+}
+
+/* See GoogleButton.tsx. Darker than .btn--secondary's label because the
+   wordmark beside it is near-black. */
+.btn--google {
   color: var(--ink-800);
 }
 
 .btn--google img {
   display: block;
   flex-shrink: 0;
+}
+
+/* .btn is full width because every form in the app wants it that way. The
+   landing page sits two of them side by side in a line of prose, where
+   100% would stack them across the whole column. */
+.btn--inline {
+  width: auto;
 }
