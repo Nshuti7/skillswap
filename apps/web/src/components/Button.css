@@ -54,3 +54,16 @@
 .btn__trailing img {
   display: block;
 }
+
+/* Google sign-in is a link rather than a button, because it leaves the SPA
+   entirely. See GoogleButton.tsx. These rules only undo what an anchor brings
+   with it; everything else comes from .btn and .btn--secondary. */
+.btn--google {
+  text-decoration: none;
+  color: var(--ink-800);
+}
+
+.btn--google img {
+  display: block;
+  flex-shrink: 0;
+}
