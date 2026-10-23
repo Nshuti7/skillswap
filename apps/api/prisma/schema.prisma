@@ -72,7 +72,12 @@ model User {
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
-  // TODO(team): IUEA verification (isVerified / studentId). Pilot is IUEA-only.
+  // IUEA verification (SS-13). Pilot is IUEA-only.
+  // There is no isVerified column: a user is verified when verifiedAt IS NOT NULL.
+  // studentId is unique. Postgres allows many NULLs under a unique index,
+  // so unverified users with no studentId do not collide.
+  studentId  String?   @unique @map("student_id")
+  verifiedAt DateTime? @map("verified_at")
 
   skills                        UserSkill[]
   sentRequests                  SkillRequest[]      @relation("RequestRequester")
@@ -95,8 +100,9 @@ model Skill {
   category    String
   description String?
 
-  userSkills UserSkill[]
-  requests   SkillRequest[]
+  userSkills          UserSkill[]
+  offeredInRequests   SkillRequest[] @relation("RequestOfferedSkill")
+  requestedInRequests SkillRequest[] @relation("RequestRequestedSkill")
 
   @@map("skills")
 }
@@ -117,25 +123,36 @@ model UserSkill {
 }
 
 // Matching
+// Swaps are reciprocal (SS-11): the requester teaches offeredSkillId and
+// wants to learn requestedSkillId from the target user.
+//
+// Constraints Prisma cannot express. Both go into the SS-15 migration as raw SQL:
+//   1. CHECK (offered_skill_id <> requested_skill_id)
+//   2. Partial unique index on
+//      (requester_id, target_user_id, offered_skill_id, requested_skill_id)
+//      WHERE status = 'PENDING', so the same request cannot be sent twice.
+// The API also validates (1) with zod. The rule that the requester lists the
+// offered skill as TEACH in UserSkill is enforced in the service layer.
 
 model SkillRequest {
-  id           String             @id @default(uuid()) @db.Uuid
-  requesterId  String             @map("requester_id") @db.Uuid
-  targetUserId String             @map("target_user_id") @db.Uuid
-  skillId      String             @map("skill_id") @db.Uuid
-  status       SkillRequestStatus @default(PENDING)
-  createdAt    DateTime           @default(now()) @map("created_at")
-  updatedAt    DateTime           @updatedAt @map("updated_at")
+  id               String             @id @default(uuid()) @db.Uuid
+  requesterId      String             @map("requester_id") @db.Uuid
+  targetUserId     String             @map("target_user_id") @db.Uuid
+  offeredSkillId   String             @map("offered_skill_id") @db.Uuid
+  requestedSkillId String             @map("requested_skill_id") @db.Uuid
+  status           SkillRequestStatus @default(PENDING)
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
 
-  // TODO(team): swaps are reciprocal. Consider offeredSkillId + requestedSkillId.
-
-  requester    User          @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
-  targetUser   User          @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
-  skill        Skill         @relation(fields: [skillId], references: [id])
-  session      SwapSession?
-  conversation Conversation?
+  requester      User          @relation("RequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  targetUser     User          @relation("RequestTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  offeredSkill   Skill         @relation("RequestOfferedSkill", fields: [offeredSkillId], references: [id])
+  requestedSkill Skill         @relation("RequestRequestedSkill", fields: [requestedSkillId], references: [id])
+  session        SwapSession?
+  conversation   Conversation?
 
   @@index([targetUserId, status])
+  @@index([requesterId, status])
   @@map("skill_requests")
 }
 

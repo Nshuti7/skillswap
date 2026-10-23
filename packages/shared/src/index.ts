@@ -42,6 +42,26 @@ export const SkillRequestStatus = {
 export type SkillRequestStatus =
   (typeof SkillRequestStatus)[keyof typeof SkillRequestStatus];
 
+export const SwapSessionStatus = {
+  ACTIVE: "ACTIVE",
+  COMPLETED: "COMPLETED",
+  CANCELLED: "CANCELLED",
+} as const;
+export type SwapSessionStatus =
+  (typeof SwapSessionStatus)[keyof typeof SwapSessionStatus];
+
+export const ReviewRole = {
+  MENTOR: "MENTOR",
+  LEARNER: "LEARNER",
+} as const;
+export type ReviewRole = (typeof ReviewRole)[keyof typeof ReviewRole];
+
+export const FlagStatus = {
+  OPEN: "OPEN",
+  RESOLVED: "RESOLVED",
+} as const;
+export type FlagStatus = (typeof FlagStatus)[keyof typeof FlagStatus];
+
 // What the API returns for a user. Never includes passwordHash.
 export interface UserDTO {
   id: string;
