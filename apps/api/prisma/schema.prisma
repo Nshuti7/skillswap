@@ -149,13 +149,24 @@ model SkillRequest {
 //    the session without a redundant second FK.
 // 2. Two participants only: participantOneId / participantTwoId FKs to User.
 //    No ConversationParticipant join table. Matches the MVP; group chat
-//    would need a join-table migration later. The service layer must enforce
-//    participantOneId != participantTwoId and that both match the request's
-//    requester/target.
+//    would need a join-table migration later.
+//    These two columns duplicate the request's requesterId / targetUserId on
+//    purpose. Reading a user's inbox has to filter on "am I in this thread",
+//    and going through skill_requests for that costs a join on every query.
+//    Denormalised so [participantId, lastMessageAt] can serve the inbox from
+//    one index. The service layer owns keeping them in step with the request.
 // 3. No soft delete on messages for the pilot: messages are hard-deleted via
 //    Cascade when the conversation goes away. Revisit if moderation needs it.
-//    The service layer must touch Conversation.updatedAt on each new message
-//    so "my conversations, most recent first" stays correct.
+//
+// Constraints Prisma cannot express. These go into the SS-15 migration as raw SQL:
+//   1. CHECK (participant_one_id <> participant_two_id)
+//   2. CHECK (char_length(body) > 0) on messages, so a whitespace-only body
+//      cannot be stored. The upper bound is the VarChar below.
+// Rules that stay in the service layer, because they span tables:
+//   1. Both participants must match the request's requester / target.
+//   2. A conversation may only be created once the request is ACCEPTED.
+//      A CHECK cannot read another table, so this is a zod + service guard,
+//      not a database one. Acceptance criteria live on the SS-12 service ticket.
 
 model Conversation {
   id               String   @id @default(uuid()) @db.Uuid
@@ -165,26 +176,43 @@ model Conversation {
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
+  // The inbox sorts on this, not on updatedAt. @updatedAt only fires when the
+  // Conversation row itself is written, and inserting a Message does not touch
+  // it, so an updatedAt index would have sorted by "last time the row changed"
+  // rather than "last message" and the inbox order would have been wrong.
+  // Defaults to creation time so a thread with no messages yet still sorts.
+  // The service layer must set this in the same transaction as the insert:
+  //   prisma.$transaction([message.create(...), conversation.update(...)])
+  lastMessageAt DateTime @default(now()) @map("last_message_at")
+
   request        SkillRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
   participantOne User         @relation("ConversationParticipantOne", fields: [participantOneId], references: [id], onDelete: Cascade)
   participantTwo User         @relation("ConversationParticipantTwo", fields: [participantTwoId], references: [id], onDelete: Cascade)
   messages       Message[]
 
-  @@index([participantOneId, updatedAt])
-  @@index([participantTwoId, updatedAt])
+  @@index([participantOneId, lastMessageAt])
+  @@index([participantTwoId, lastMessageAt])
   @@map("conversations")
 }
 
 model Message {
   id             String    @id @default(uuid()) @db.Uuid
   conversationId String    @map("conversation_id") @db.Uuid
-  senderId       String    @map("sender_id") @db.Uuid
-  body           String
+  // Nullable so deleting a user does not delete their messages. Cascade here
+  // would erase half of the other participant's thread, and the other person
+  // did nothing wrong. Restrict would make the user row undeletable instead.
+  // SetNull keeps the thread readable; render a null sender as "Deleted user".
+  senderId       String?   @map("sender_id") @db.Uuid
+  // Bounded on purpose. Postgres text is unlimited, and the only guard in front
+  // of it is express.json({ limit: '1mb' }), which caps the whole body rather
+  // than this field. Mirror the 2000 in the zod schema so the API rejects an
+  // over-long message with a 400 instead of a database error.
+  body           String    @db.VarChar(2000)
   createdAt      DateTime  @default(now()) @map("created_at")
   readAt         DateTime? @map("read_at")
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  sender       User?        @relation(fields: [senderId], references: [id], onDelete: SetNull)
 
   @@index([conversationId, createdAt])
   @@map("messages")
