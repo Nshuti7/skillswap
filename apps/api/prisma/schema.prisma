@@ -72,7 +72,12 @@ model User {
   createdAt       DateTime        @default(now()) @map("created_at")
   updatedAt       DateTime        @updatedAt @map("updated_at")
 
-  // TODO(team): IUEA verification (isVerified / studentId). Pilot is IUEA-only.
+  // IUEA verification (SS-13). Pilot is IUEA-only.
+  // There is no isVerified column: a user is verified when verifiedAt IS NOT NULL.
+  // studentId is unique. Postgres allows many NULLs under a unique index,
+  // so unverified users with no studentId do not collide.
+  studentId  String?   @unique @map("student_id")
+  verifiedAt DateTime? @map("verified_at")
 
   skills           UserSkill[]
   sentRequests     SkillRequest[]      @relation("RequestRequester")
