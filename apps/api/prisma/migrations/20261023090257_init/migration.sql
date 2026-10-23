@@ -208,3 +208,22 @@ ALTER TABLE "flags" ADD CONSTRAINT "flags_session_id_fkey" FOREIGN KEY ("session
 
 -- AddForeignKey
 ALTER TABLE "flags" ADD CONSTRAINT "flags_reported_by_fkey" FOREIGN KEY ("reported_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Hand-written below this line. Prisma's schema language cannot express either
+-- of these, so they live here. See the SkillRequest comment block in
+-- schema.prisma, which is where they were specified.
+
+-- A swap exchanges two different skills. Offering and requesting the same one
+-- is not a swap. zod checks this at the API edge; this is the backstop for
+-- seeds, scripts and anything else that writes without going through Express.
+ALTER TABLE "skill_requests"
+  ADD CONSTRAINT "skill_requests_offered_differs_from_requested"
+  CHECK ("offered_skill_id" <> "requested_skill_id");
+
+-- One pending request per requester, target and skill pair. Without it the same
+-- request can be sent any number of times, and because a Conversation is unique
+-- per request, every duplicate would open its own chat thread. Partial on
+-- PENDING so a rejected or completed request does not stop someone asking again.
+CREATE UNIQUE INDEX "skill_requests_one_pending_per_pair"
+  ON "skill_requests" ("requester_id", "target_user_id", "offered_skill_id", "requested_skill_id")
+  WHERE "status" = 'PENDING';
