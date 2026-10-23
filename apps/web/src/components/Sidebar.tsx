@@ -13,7 +13,7 @@ import logo from '../assets/logo-light.png'
 import './Sidebar.css'
 
 const primary = [
-  { to: '/', label: 'Dashboard', Icon: IconDashboard, end: true },
+  { to: '/dashboard', label: 'Dashboard', Icon: IconDashboard, end: true },
   { to: '/find', label: 'Find Skills', Icon: IconSearch },
   { to: '/swaps', label: 'My Swaps', Icon: IconSwap },
   { to: '/messages', label: 'Messages', Icon: IconMessage },
