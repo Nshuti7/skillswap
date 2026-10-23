@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppShell } from './components/AppShell'
 import { DashboardPage } from './pages/DashboardPage'
+import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 
 function Placeholder({ title }: { title: string }) {
@@ -13,6 +14,11 @@ export default function App() {
       <Routes>
         {/* Auth screens sit outside the shell: no sidebar, no top bar. */}
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        {/* Linked from Log in and not designed yet. It has to be routed here
+            rather than falling through to the shell, which would put a
+            sidebar and a signed-in top bar in front of a signed-out user. */}
+        <Route path="/forgot-password" element={<Placeholder title="Forgot password" />} />
 
         <Route
           path="*"

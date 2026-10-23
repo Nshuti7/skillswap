@@ -1,15 +1,15 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type FormEvent, type MouseEvent } from 'react'
+import { Link } from 'react-router-dom'
+import { AuthAside } from '../components/AuthAside'
 import { Button } from '../components/Button'
 import { Checkbox } from '../components/Checkbox'
+import { GoogleButton } from '../components/GoogleButton'
 import { TextField } from '../components/TextField'
 import arrowRight from '../assets/icon-arrow-right.svg'
 import check from '../assets/icon-check.svg'
 import eye from '../assets/icon-eye.svg'
 import lock from '../assets/icon-lock.svg'
-// Light-on-dark lockup, taken from the Background1 frame in Figma. The default
-// logo.png is drawn for light surfaces and goes muddy on the navy panel.
-import logo from '../assets/logo-light.png'
-import './RegisterPage.css'
+import '../styles/auth.css'
 
 type Errors = Partial<Record<'name' | 'email' | 'password' | 'terms', string>>
 
@@ -17,6 +17,8 @@ type Errors = Partial<Record<'name' | 'email' | 'password' | 'terms', string>>
 // Server-side validation is still the authority; this only saves a round trip.
 const MIN_PASSWORD = 8
 const MAX_PASSWORD = 72
+
+const TERMS_REQUIRED = 'Accept the terms to continue.'
 
 export function RegisterPage() {
   const [name, setName] = useState('')
@@ -35,7 +37,7 @@ export function RegisterPage() {
     } else if (password.length > MAX_PASSWORD) {
       next.password = `Use no more than ${MAX_PASSWORD} characters.`
     }
-    if (!accepted) next.terms = 'Accept the terms to continue.'
+    if (!accepted) next.terms = TERMS_REQUIRED
     return next
   }
 
@@ -48,26 +50,22 @@ export function RegisterPage() {
     // Blocked on SS-15; there is no database to register against yet.
   }
 
+  // Signing up through Google still creates an account, so it is still bound
+  // by the terms. The checkbox gates both routes or it gates neither.
+  function handleGoogle(event: MouseEvent<HTMLAnchorElement>) {
+    if (accepted) return
+    event.preventDefault()
+    setErrors((previous) => ({ ...previous, terms: TERMS_REQUIRED }))
+  }
+
   return (
     <main className="auth">
-      <section className="auth__aside">
-        <img className="auth__logo" src={logo} alt="SkillSwap" />
-        <div className="auth__pitch">
-          <p className="auth__eyebrow">Learn together</p>
-          <h1 className="auth__headline">
-            What you know can open a door for someone else.
-          </h1>
-          <p className="auth__sub">
-            Exchange practical skills with students around you. No fees, no pressure,
-            just people helping people grow.
-          </p>
-        </div>
-      </section>
+      <AuthAside />
 
       <section className="auth__panel">
         <div className="auth__form-wrap">
           <p className="auth__welcome">Welcome to SkillSwap</p>
-          <h2 className="auth__title">Create your account</h2>
+          <h1 className="auth__title">Create your account</h1>
 
           <form className="auth__form" onSubmit={handleSubmit} noValidate>
             <TextField
@@ -135,13 +133,17 @@ export function RegisterPage() {
             </Button>
           </form>
 
+          <p className="auth__or">or</p>
+
+          <GoogleButton onClick={handleGoogle}>Sign up with Google</GoogleButton>
+
           <p className="auth__trust">
             <img src={check} alt="" width={22} height={22} />
             Your details are protected and never shared.
           </p>
 
           <p className="auth__alt">
-            Already have an account? <a href="/login">Log in</a>
+            Already have an account? <Link to="/login">Log in</Link>
           </p>
         </div>
       </section>

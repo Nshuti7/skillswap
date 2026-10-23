@@ -1,3 +1,9 @@
+/*
+ * The split auth layout, shared by Register and Log in. Both screens are the
+ * same frame in Figma with a different right-hand panel, so the .auth__*
+ * classes live here rather than next to either page.
+ */
+
 .auth {
   display: grid;
   /* The mockup gave the panel 610 of 1440 (42%) and left the form crowded
@@ -116,6 +122,47 @@
   margin: var(--space-5) 0 0;
   font-size: var(--text-sm);
   color: var(--ink-400);
+}
+
+/* The lede only appears on Log in, where the title is followed by a line of
+   copy. The title gives up its own bottom margin so the pair sits together. */
+.auth__title--lede {
+  margin-bottom: 0;
+}
+
+.auth__lede {
+  margin: var(--space-2) 0 var(--space-7);
+  font-size: var(--text-base);
+  color: var(--ink-600);
+}
+
+/* Keeps a field and the link that belongs to it tighter than the form's own
+   row gap, so "Forgot password?" reads as part of the password field. */
+.auth__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.auth__stack > .field {
+  width: 100%;
+}
+
+.auth__forgot {
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* The design has no rules either side of the "or", just the word, centred
+   between the two ways in. aria-hidden would hide a real distinction: the
+   two controls below and above it are alternatives, not a sequence. */
+.auth__or {
+  margin: var(--space-5) 0;
+  font-size: var(--text-base);
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink-600);
 }
 
 /* Sits directly under the form instead of being pinned to the bottom of the
