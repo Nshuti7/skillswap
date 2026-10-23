@@ -3,7 +3,10 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-5);
-  height: 80px;
+  /* 64, not the mockup's 80. The bar is sticky (see AppShell.css), so its
+     height is paid for on every screen rather than scrolled past once, and
+     80px is 14% of a short laptop viewport. */
+  height: 64px;
   flex-shrink: 0;
   padding: 0 var(--space-6);
   background: var(--surface);
